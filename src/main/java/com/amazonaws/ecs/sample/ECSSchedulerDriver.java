@@ -292,6 +292,12 @@ public class ECSSchedulerDriver implements SchedulerDriver {
     }
 
     @Override
+    public Protos.Status acceptOffers(Collection<Protos.OfferID> collection, Collection<Protos.Offer.Operation> collection1, Protos.Filters filters) {
+        // TODO - Implement me
+        return null;
+    }
+
+    @Override
     public Protos.Status declineOffer(final Protos.OfferID offerID, Protos.Filters filters) {
         return launchTasks(new ArrayList<Protos.OfferID>() {{
             add(offerID);
@@ -309,6 +315,18 @@ public class ECSSchedulerDriver implements SchedulerDriver {
         synchronized (lock) {
             return status;
         }
+    }
+
+    @Override
+    public Protos.Status suppressOffers() {
+        // TODO - Implement me
+        return null;
+    }
+
+    @Override
+    public Protos.Status acknowledgeStatusUpdate(Protos.TaskStatus taskStatus) {
+        // TODO - Implement me
+        return null;
     }
 
     @Override
