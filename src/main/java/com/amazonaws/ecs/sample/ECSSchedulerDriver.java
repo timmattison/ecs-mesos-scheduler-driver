@@ -15,7 +15,10 @@ language governing permissions and limitations under the License.
 
 package com.amazonaws.ecs.sample;
 
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSClient;
+import com.amazonaws.services.ecs.AmazonECSClientBuilder;
 import com.amazonaws.services.ecs.model.ContainerInstance;
 import com.amazonaws.services.ecs.model.DescribeContainerInstancesRequest;
 import com.amazonaws.services.ecs.model.DescribeContainerInstancesResult;
@@ -64,7 +67,7 @@ public class ECSSchedulerDriver implements SchedulerDriver {
 
     private final Scheduler scheduler;
     private final Map<Protos.TaskID, String> taskMap;
-    private final AmazonECSClient client;
+    private final AmazonECS client;
     private final String clusterName;
     private final Protos.MasterInfo masterInfo;
     private final ScheduledExecutorService executorService;
@@ -83,18 +86,23 @@ public class ECSSchedulerDriver implements SchedulerDriver {
         } else {
             this.frameworkInfo = Protos.FrameworkInfo.newBuilder(frameworkInfo)
                     .setId(Protos.FrameworkID.newBuilder()
-                                    .setValue(UUID.randomUUID().toString())
-                                    .build()
+                            .setValue(UUID.randomUUID().toString())
+                            .build()
                     )
                     .build();
         }
         this.taskMap = new HashMap<Protos.TaskID, String>();
-        this.client = new AmazonECSClient();
-        String endpoint = System.getenv("AWS_ECS_ENDPOINT");
-        if (endpoint == null || "".equals(endpoint)) {
-            endpoint = "https://ecs.us-east-1.amazonaws.com";
+        AmazonECSClientBuilder amazonECSClientBuilder = AmazonECSClient.builder();
+        String region = System.getenv("AWS_ECS_REGION");
+
+        if (region == null || "".equals(region)) {
+            amazonECSClientBuilder.setRegion(region);
         }
-        client.setEndpoint(endpoint);
+
+        client = amazonECSClientBuilder.build();
+
+        String endpoint = amazonECSClientBuilder.getEndpoint().getServiceEndpoint();
+
         String cluster = System.getenv("AWS_ECS_CLUSTER");
         if (cluster == null || "".equals(cluster)) {
             cluster = "default";
